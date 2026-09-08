@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0e14" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Costo 3D A1" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <title>Costo 3D · Bambu Lab A1</title>
+  <style>
+    :root{
+      --bg:#090b10; --panel:#11151d; --panel2:#171c26; --text:#f5f7fb; --muted:#929bad;
+      --accent:#4da3ff; --green:#39d98a; --yellow:#ffca5c; --border:#252c38; --danger:#ff6b6b;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(circle at 50% -20%,#172238 0,#090b10 38%);color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;min-height:100vh}
+    .wrap{max-width:760px;margin:auto;padding:calc(18px + env(safe-area-inset-top)) 16px calc(100px + env(safe-area-inset-bottom))}
+    header{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin:8px 2px 18px}
+    .eyebrow{font-size:12px;color:var(--accent);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+    h1{font-size:25px;line-height:1.08;margin:5px 0 3px}.sub{color:var(--muted);font-size:13px}
+    .badge{border:1px solid #244e79;color:#8cc5ff;background:#0d1a29;padding:7px 10px;border-radius:999px;font-size:12px;white-space:nowrap}
+    .hero{background:linear-gradient(145deg,#131925,#0d1118);border:1px solid var(--border);border-radius:24px;padding:20px;margin-bottom:14px;
+      box-shadow:0 18px 50px rgba(0,0,0,.28)}
+    .hero-label{color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.05em}
+    .price{font-size:48px;font-weight:800;letter-spacing:-.04em;margin:5px 0 2px}.price small{font-size:24px;color:#cbd3df}
+    .profit{color:var(--green);font-size:14px;font-weight:700}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid .full{grid-column:1/-1}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:16px;margin-bottom:14px}
+    .card h2{font-size:16px;margin:0 0 14px}.section-note{color:var(--muted);font-size:12px;margin-top:-8px;margin-bottom:12px}
+    label{display:block;color:#c6cdda;font-size:12px;font-weight:650;margin-bottom:6px}
+    .field{background:var(--panel2);border:1px solid #293140;border-radius:14px;display:flex;align-items:center;padding:0 12px;min-height:52px}
+    input{width:100%;background:none;border:none;outline:none;color:#fff;font-size:17px;font-weight:650;padding:14px 4px}
+    .unit{color:var(--muted);font-size:13px;white-space:nowrap}
+    .breakdown{display:grid;gap:9px}.row{display:flex;justify-content:space-between;gap:12px;font-size:14px}
+    .row span:first-child{color:var(--muted)}.total{border-top:1px solid var(--border);padding-top:10px;margin-top:2px;font-weight:800}
+    button{border:none;border-radius:14px;padding:13px 15px;font-size:14px;font-weight:750;cursor:pointer}
+    .primary{background:var(--accent);color:#06101d;width:100%}.secondary{background:#1b2230;color:#dbe5f3;border:1px solid #2b3545}
+    .danger{background:#2a1719;color:#ff9c9c;border:1px solid #4c2529}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(10,12,17,.93);backdrop-filter:blur(22px);
+      border-top:1px solid var(--border);padding:9px 12px calc(9px + env(safe-area-inset-bottom));display:flex;justify-content:center;z-index:10}
+    .tabs-inner{width:min(720px,100%);display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .tab{background:none;color:var(--muted);padding:10px 6px}.tab.active{background:#192131;color:#fff}
+    .view{display:none}.view.active{display:block}
+    .quote{background:#151a23;border:1px solid var(--border);border-radius:15px;padding:13px;margin-bottom:9px}
+    .quote-top{display:flex;justify-content:space-between;gap:12px}.quote-name{font-weight:750}.quote-price{font-weight:800;color:var(--green)}
+    .quote-meta{font-size:12px;color:var(--muted);margin-top:5px}
+    .empty{text-align:center;color:var(--muted);padding:32px 12px}
+    .install{font-size:12px;color:var(--muted);line-height:1.5}
+    .pill{display:inline-block;border:1px solid var(--border);padding:4px 8px;border-radius:999px;color:#c5cedb;margin-top:7px}
+    @media(max-width:480px){.grid{grid-template-columns:1fr}.grid .full{grid-column:auto}.price{font-size:44px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><div class="eyebrow">Calculadora 3D</div><h1>Bambu Lab A1</h1><div class="sub">Quetzaltenango · funciona sin conexión</div></div>
+    <div class="badge">PWA · Offline</div>
+  </header>
+
+  <section id="calc" class="view active">
+    <div class="hero">
+      <div class="hero-label">PRECIO DE VENTA RECOMENDADO</div>
+      <div class="price"><small>Q</small> <span id="salePrice">0.00</span></div>
+      <div class="profit">Ganancia estimada: Q <span id="profit">0.00</span></div>
+    </div>
+
+    <div class="card">
+      <h2>Tu impresión</h2>
+      <div class="grid">
+        <div><label>Nombre de la pieza</label><div class="field"><input id="name" value="Pieza" /></div></div>
+        <div><label>Filamento utilizado</label><div class="field"><input id="grams" type="number" min="0" step="1" value="100"><span class="unit">g</span></div></div>
+        <div><label>Horas</label><div class="field"><input id="hours" type="number" min="0" step="1" value="5"><span class="unit">h</span></div></div>
+        <div><label>Minutos</label><div class="field"><input id="minutes" type="number" min="0" max="59" step="1" value="0"><span class="unit">min</span></div></div>
+        <div><label>Precio del filamento</label><div class="field"><span class="unit">Q</span><input id="filamentPrice" type="number" min="0" step=".01" value="150"><span class="unit">/kg</span></div></div>
+        <div><label>Ganancia sobre costo</label><div class="field"><input id="markup" type="number" min="0" step="1" value="30"><span class="unit">%</span></div></div>
+        <div><label>Mano de obra / extra</label><div class="field"><span class="unit">Q</span><input id="extra" type="number" min="0" step=".01" value="0"></div></div>
+        <div><label>Cantidad de piezas</label><div class="field"><input id="qty" type="number" min="1" step="1" value="1"><span class="unit">u</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Así se calcula</h2>
+      <div class="breakdown">
+        <div class="row"><span>Filamento</span><strong>Q <span id="materialCost">0.00</span></strong></div>
+        <div class="row"><span>Electricidad</span><strong>Q <span id="electricCost">0.00</span></strong></div>
+        <div class="row"><span>Desgaste / máquina</span><strong>Q <span id="wearCost">0.00</span></strong></div>
+        <div class="row"><span>Extras</span><strong>Q <span id="extraCost">0.00</span></strong></div>
+        <div class="row total"><span>Costo total</span><strong>Q <span id="totalCost">0.00</span></strong></div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="primary" id="saveBtn">Guardar cotización</button>
+      <button class="secondary" id="resetBtn">Nueva</button>
+    </div>
+  </section>
+
+  <section id="history" class="view">
+    <div class="card">
+      <h2>Cotizaciones guardadas</h2>
+      <div class="section-note">Se guardan únicamente en este dispositivo.</div>
+      <div id="quotes"></div>
+      <div class="actions">
+        <button class="secondary" id="exportBtn">Exportar CSV</button>
+        <button class="danger" id="clearBtn">Borrar historial</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="settings" class="view">
+    <div class="card">
+      <h2>Ajustes de electricidad y máquina</h2>
+      <div class="section-note">Puedes cambiar estos valores cuando cambie tu tarifa o quieras ajustar el desgaste.</div>
+      <div class="grid">
+        <div><label>Tarifa eléctrica</label><div class="field"><span class="unit">Q</span><input id="tariff" type="number" min="0" step=".000001"><span class="unit">/kWh</span></div></div>
+        <div><label>Consumo promedio A1</label><div class="field"><input id="power" type="number" min="0" step="1"><span class="unit">W</span></div></div>
+        <div><label>Desgaste / depreciación</label><div class="field"><span class="unit">Q</span><input id="wear" type="number" min="0" step=".01"><span class="unit">/h</span></div></div>
+      </div>
+      <div style="height:10px"></div>
+      <button class="primary" id="saveSettings">Guardar ajustes</button>
+    </div>
+
+    <div class="card">
+      <h2>Instalar en iPhone</h2>
+      <div class="install">Abre la dirección publicada en Safari → toca <b>Compartir</b> → <b>Agregar a pantalla de inicio</b>. Una vez abierta al menos una vez, la calculadora puede cargar sin conexión gracias al modo PWA.</div>
+      <div class="pill">Tus datos quedan en el iPhone</div>
+    </div>
+  </section>
+</div>
+
+<nav class="tabs">
+  <div class="tabs-inner">
+    <button class="tab active" data-view="calc">Calculadora</button>
+    <button class="tab" data-view="history">Historial</button>
+    <button class="tab" data-view="settings">Ajustes</button>
+  </div>
+</nav>
+
+<script>
+const $ = id => document.getElementById(id);
+const defaults = { tariff: 1.387171, power: 120, wear: 2 };
+const savedSettings = JSON.parse(localStorage.getItem('a1_settings') || '{}');
+$('tariff').value = savedSettings.tariff ?? defaults.tariff;
+$('power').value = savedSettings.power ?? defaults.power;
+$('wear').value = savedSettings.wear ?? defaults.wear;
+
+function n(id){ return Math.max(0, parseFloat($(id).value) || 0); }
+function calc(){
+  const h = n('hours') + Math.min(59,n('minutes'))/60;
+  const grams = n('grams'), qty = Math.max(1,n('qty'));
+  const material = grams/1000*n('filamentPrice');
+  const electricity = h*(n('power')/1000)*n('tariff');
+  const wear = h*n('wear');
+  const extra = n('extra');
+  const cost = material + electricity + wear + extra;
+  const sale = cost*(1+n('markup')/100);
+  const profit = sale-cost;
+  $('materialCost').textContent=material.toFixed(2);
+  $('electricCost').textContent=electricity.toFixed(2);
+  $('wearCost').textContent=wear.toFixed(2);
+  $('extraCost').textContent=extra.toFixed(2);
+  $('totalCost').textContent=cost.toFixed(2);
+  $('salePrice').textContent=sale.toFixed(2);
+  $('profit').textContent=profit.toFixed(2);
+  return {h,grams,qty,material,electricity,wear,extra,cost,sale,profit,
+    filamentPrice:n('filamentPrice'),markup:n('markup'),name:$('name').value.trim()||'Pieza'};
+}
+document.querySelectorAll('input').forEach(i=>i.addEventListener('input',calc));
+$('saveSettings').onclick=()=>{
+  localStorage.setItem('a1_settings',JSON.stringify({tariff:n('tariff'),power:n('power'),wear:n('wear')}));
+  calc(); $('saveSettings').textContent='Guardado ✓'; setTimeout(()=>$('saveSettings').textContent='Guardar ajustes',1200);
+};
+function getQuotes(){return JSON.parse(localStorage.getItem('a1_quotes')||'[]')}
+function setQuotes(q){localStorage.setItem('a1_quotes',JSON.stringify(q)); renderQuotes();}
+$('saveBtn').onclick=()=>{
+  const q=calc(); q.date=new Date().toISOString(); q.id=Date.now();
+  const arr=getQuotes(); arr.unshift(q); setQuotes(arr);
+  $('saveBtn').textContent='Guardada ✓'; setTimeout(()=>$('saveBtn').textContent='Guardar cotización',1200);
+};
+$('resetBtn').onclick=()=>{ $('name').value='Pieza'; $('grams').value=100; $('hours').value=5; $('minutes').value=0; $('extra').value=0; $('qty').value=1; calc();};
+function renderQuotes(){
+  const qs=getQuotes(), box=$('quotes');
+  if(!qs.length){box.innerHTML='<div class="empty">Todavía no hay cotizaciones guardadas.</div>';return}
+  box.innerHTML=qs.map(q=>`<div class="quote">
+    <div class="quote-top"><div class="quote-name">${esc(q.name)}</div><div class="quote-price">Q ${q.sale.toFixed(2)}</div></div>
+    <div class="quote-meta">${new Date(q.date).toLocaleString('es-GT')} · ${q.grams} g · ${q.h.toFixed(2)} h · ganancia Q ${q.profit.toFixed(2)}</div>
+  </div>`).join('');
+}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+$('clearBtn').onclick=()=>{ if(confirm('¿Borrar todas las cotizaciones?')) setQuotes([]); };
+$('exportBtn').onclick=()=>{
+ const qs=getQuotes(); if(!qs.length)return alert('No hay cotizaciones.');
+ const rows=[['Fecha','Pieza','Gramos','Horas','Costo Q','Venta Q','Ganancia Q','Markup %'],
+ ...qs.map(q=>[new Date(q.date).toLocaleString('es-GT'),q.name,q.grams,q.h.toFixed(2),q.cost.toFixed(2),q.sale.toFixed(2),q.profit.toFixed(2),q.markup])];
+ const csv=rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(',')).join('\n');
+ const blob=new Blob(["\ufeff"+csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a');
+ a.href=URL.createObjectURL(blob); a.download='cotizaciones_3d_a1.csv'; a.click(); URL.revokeObjectURL(a.href);
+};
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));
+ document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===b.dataset.view));
+ if(b.dataset.view==='history')renderQuotes();
+ window.scrollTo({top:0,behavior:'smooth'});
+});
+if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
+calc(); renderQuotes();
+</script>
+</body>
+</html>
